@@ -1,0 +1,142 @@
+{
+    "files.associations": {
+        "charconv": "cpp",
+        "iostream": "cpp",
+        "vector": "cpp",
+        "cassert": "cpp",
+        "cctype": "cpp",
+        "cerrno": "cpp",
+        "cfloat": "cpp",
+        "ciso646": "cpp",
+        "random": "cpp",
+        "array": "cpp",
+        "bitset": "cpp",
+        "string_view": "cpp",
+        "initializer_list": "cpp",
+        "ranges": "cpp",
+        "span": "cpp",
+        "regex": "cpp",
+        "utility": "cpp",
+        "valarray": "cpp",
+        "*.tcc": "cpp",
+        "deque": "cpp",
+        "list": "cpp",
+        "string": "cpp",
+        "unordered_map": "cpp",
+        "unordered_set": "cpp",
+        "forward_list": "cpp",
+        "xhash": "cpp",
+        "iomanip": "cpp",
+        "atomic": "cpp",
+        "barrier": "cpp",
+        "bit": "cpp",
+        "chrono": "cpp",
+        "clocale": "cpp",
+        "cmath": "cpp",
+        "compare": "cpp",
+        "concepts": "cpp",
+        "coroutine": "cpp",
+        "cstdarg": "cpp",
+        "cstddef": "cpp",
+        "cstdint": "cpp",
+        "cstdio": "cpp",
+        "cstdlib": "cpp",
+        "cstring": "cpp",
+        "ctime": "cpp",
+        "cwchar": "cpp",
+        "cwctype": "cpp",
+        "map": "cpp",
+        "set": "cpp",
+        "exception": "cpp",
+        "algorithm": "cpp",
+        "functional": "cpp",
+        "iterator": "cpp",
+        "memory": "cpp",
+        "memory_resource": "cpp",
+        "numeric": "cpp",
+        "optional": "cpp",
+        "ratio": "cpp",
+        "source_location": "cpp",
+        "system_error": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp",
+        "fstream": "cpp",
+        "iosfwd": "cpp",
+        "istream": "cpp",
+        "latch": "cpp",
+        "limits": "cpp",
+        "new": "cpp",
+        "numbers": "cpp",
+        "ostream": "cpp",
+        "semaphore": "cpp",
+        "sstream": "cpp",
+        "stdexcept": "cpp",
+        "stop_token": "cpp",
+        "streambuf": "cpp",
+        "syncstream": "cpp",
+        "typeinfo": "cpp",
+        "any": "cpp",
+        "cfenv": "cpp",
+        "cinttypes": "cpp",
+        "codecvt": "cpp",
+        "complex": "cpp",
+        "condition_variable": "cpp",
+        "csetjmp": "cpp",
+        "csignal": "cpp",
+        "cuchar": "cpp",
+        "future": "cpp",
+        "mutex": "cpp",
+        "scoped_allocator": "cpp",
+        "shared_mutex": "cpp",
+        "thread": "cpp",
+        "typeindex": "cpp",
+        "variant": "cpp"
+    },
+    // 禁用 C/C++ IntelliSense
+    "C_Cpp.errorSquiggles": "disabled",
+    "C_Cpp.intelliSenseEngineFallback": "disabled",
+    "C_Cpp.intelliSenseEngine": "disabled",
+    "C_Cpp.autocomplete": "disabled",
+
+    "clangd.path": "/usr/bin/clangd",
+    // clangd 运行参数(在终端/命令行输入 clangd --help-list-hidden 可查看更多)
+    "clangd.arguments": [
+      // 让 clangd 生成更详细的日志
+      "--log=verbose",
+      // 启用.clangd配置文件
+      "--enable-config",
+      // 输出的 JSON 文件更美观
+      "--pretty",
+      // 全局补全(输入时弹出的建议将会提供 CMakeLists.txt 里配置的所有文件中可能的符号，会自动补充头文件)
+      "--all-scopes-completion",
+      // 建议风格：打包(重载函数只会给出一个建议）。相反可以设置为detailed
+      "--completion-style=bundled",
+      // 跨文件重命名变量
+      "--cross-file-rename",
+      // 允许补充头文件
+      "--header-insertion=iwyu",
+      // 输入建议中，已包含头文件的项与还未包含头文件的项会以圆点加以区分
+      "--header-insertion-decorators",
+      // 在后台自动分析文件(基于 complie_commands，我们用CMake生成)
+      "--background-index",
+      // 启用 Clang-Tidy 以提供「静态检查」
+      "--clang-tidy",
+      // 同时开启的任务数量
+      "-j=8",
+      // pch优化的位置(memory 或 disk，选择memory会增加内存开销，但会提升性能) 推荐在板子上使用disk
+      "--pch-storage=disk",
+      // 启用这项时，补全函数时，将会给参数提供占位符，键入后按 Tab 可以切换到下一占位符，乃至函数末，我选择禁用
+      "--function-arg-placeholders=false",
+      // compelie_commands.json 文件的目录位置(相对于工作区，由于 CMake 生成的该文件默认在 build 文件夹中，故设置为 build)
+      "--compile-commands-dir=build",
+      //询问编译器头文件的位置
+      "--query-driver=/usr/bin/g++"
+    ],
+    "cph.general.onceMaintainerMessage": false, 
+    "github.copilot.enable": {
+      "*": true,
+      "plaintext": true,
+      "markdown": true,
+      "cpp": true
+  }
+}
