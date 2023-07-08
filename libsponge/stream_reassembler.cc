@@ -13,7 +13,7 @@ void DUMMY_CODE(Targs &&... /* unused */) {}
 using namespace std;
 
 StreamReassembler::StreamReassembler(const size_t capacity) : _output(capacity), _capacity(capacity), 
-                                                              _stream(), _cur_index(0),
+                                                              _stream(capacity), _cur_index(0),
                                                               _eof_index(std::numeric_limits<size_t>::max()), 
                                                               _unassembled_bytes_cnt(0) {}
 
@@ -25,7 +25,7 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
     auto ed = min(index + data.size(), min(_cur_index + _capacity - _output.buffer_size(), _eof_index));
     if (eof) _eof_index = min(_eof_index, index + data.size());
     for (size_t i = st, j = st - index; i < ed; ++i, ++j) {
-        auto &t = _stream[i];
+        auto &t = _stream[i % _capacity];
         if (t.second == true) {
             if (t.first != data[j])
                 throw runtime_error("StreamReassembler::push_substring: Inconsistent substrings!");
@@ -35,14 +35,12 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
         }
     }
     string str;
-    auto old = _cur_index;
-    pair<char, bool> t;
-    while (_cur_index < _eof_index && (t = _stream[_cur_index]).second == true) {
-        str.push_back(t.first);
+    while (_cur_index < _eof_index && _stream[_cur_index % _capacity].second == true) {
+        str.push_back(_stream[_cur_index % _capacity].first);
+        _stream[_cur_index % _capacity] = { 0, false };
         --_unassembled_bytes_cnt, ++_cur_index;
     }
     _output.write(str);
-    _stream.erase(_stream.find(old), _stream.find(_cur_index));
     if (_cur_index == _eof_index) _output.end_input();
 }
 
