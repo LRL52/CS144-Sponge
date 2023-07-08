@@ -1,0 +1,7 @@
+CompileFlags:
+    Add: [-std=c++17, -g, -pedantic, -pedantic-errors, -Werror, -Wall, -Wextra, -Wshadow,
+    -Wpointer-arith, -Wcast-qual, -Weffc++, -Wold-style-cast]
+    Compiler: /usr/bin/g++
+Diagnostics:
+  ClangTidy:
+    Remove: [readability-misleading-indentation]
