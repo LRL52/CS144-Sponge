@@ -14,7 +14,7 @@ using namespace std;
 
 StreamReassembler::StreamReassembler(const size_t capacity) : _output(capacity), _capacity(capacity), 
                                                               _stream(capacity), _cur_index(0),
-                                                              _eof_index(std::numeric_limits<size_t>::max()), 
+                                                              _eof_index(numeric_limits<uint64_t>::max()), 
                                                               _unassembled_bytes_cnt(0) {}
 
 //! \details This function accepts a substring (aka a segment) of bytes,
@@ -23,7 +23,11 @@ StreamReassembler::StreamReassembler(const size_t capacity) : _output(capacity),
 void StreamReassembler::push_substring(const string &data, const size_t index, const bool eof) {
     auto st = max(index, _cur_index);
     auto ed = min(index + data.size(), min(_cur_index + _capacity - _output.buffer_size(), _eof_index));
-    if (eof) _eof_index = min(_eof_index, index + data.size());
+    if (eof) {
+        if (_eof_index == numeric_limits<uint64_t>::max()) _eof_index = index + data.size();
+        else if (_eof_index != index + data.size())
+            throw runtime_error("StreamReassembler::push_substring: Inconsistent EOF indexes!");
+    }
     for (size_t i = st, j = st - index; i < ed; ++i, ++j) {
         auto &t = _stream[i % _capacity];
         if (t.second == true) {

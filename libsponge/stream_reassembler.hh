@@ -20,9 +20,9 @@ class StreamReassembler {
 
     ByteStream _output;  //!< The reassembled in-order byte stream
     size_t _capacity;    //!< The maximum number of bytes
-    std::vector<std::pair<char, bool> > _stream; //!< The current part of the reassembled byte stream
-    size_t _cur_index;   //!< The index of the first byte of the reassembled byte stream
-    size_t _eof_index;         //!< The index of the last byte of the entire stream
+    std::vector<std::pair<char, bool> > _stream; //!< The current part of the unreassembled byte stream
+    uint64_t _cur_index;   //!< The index of the first byte of the unreassembled byte stream
+    uint64_t _eof_index;         //!< The index of the last byte of the entire stream
     size_t _unassembled_bytes_cnt; //!< The number of bytes that have not yet been reassembled
 
   public:
