@@ -6,8 +6,33 @@
 #include "tcp_segment.hh"
 #include "wrapping_integers.hh"
 
+#include <cstdint>
+#include <deque>
 #include <functional>
 #include <queue>
+#include <utility>
+
+//! \brief TCPSender 的计时器，最长定时时间（ms）不能超过 uint32
+class Timer {
+private:
+    uint32_t _time_count = 0;
+    uint32_t _time_out = 0;
+    bool _is_running = false;
+public:
+    Timer() = default;
+    Timer(const uint32_t time_out) : _time_out(time_out) {}
+    // void start() { _is_running = true; }
+    void stop() { _is_running = false; }
+    void set_time_out(const uint32_t time_out) { _time_out = time_out; }
+    uint32_t get_time_out() const { return _time_out; }
+    void restart() { _is_running = true, _time_count = 0; }
+    void tick(const size_t ms_since_last_tick) {
+        if (_is_running)
+            _time_count += ms_since_last_tick; 
+    }
+    bool check_time_out() const { return _is_running && _time_count >= _time_out; }
+    bool is_running() const { return _is_running; }
+};
 
 //! \brief The "sender" part of a TCP implementation.
 
@@ -31,6 +56,25 @@ class TCPSender {
 
     //! the (absolute) sequence number for the next byte to be sent
     uint64_t _next_seqno{0};
+
+    //! 重传定时器
+    Timer _timer;
+
+    //! 已经发出但还未收到 ACK 确认的 TCPSegment 队列
+    std::queue<std::pair<uint64_t, TCPSegment> > _outstanding_seg{};
+
+    //! 连续重传次数
+    uint32_t _consecutive_retransmissions_count = 0;
+
+    //! 已经发送出去但还未收到 ACK 确认的字节数
+    size_t _bytes_in_flight = 0;
+
+    //! 窗口大小，根据文档初始值应为 1
+    uint16_t _window_size = 1;
+
+    //! 是否发送带 SYN/FIN 的包
+    bool _set_syn_flag = false, _set_fin_flag = false;
+
 
   public:
     //! Initialize a TCPSender

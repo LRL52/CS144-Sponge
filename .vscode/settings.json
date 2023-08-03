@@ -137,6 +137,6 @@
       "*": true,
       "plaintext": true,
       "markdown": true,
-      "cpp": true
+      "cpp": false
   }
 }
