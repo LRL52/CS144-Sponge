@@ -23,12 +23,12 @@ void get_URL(const string &host, const string &path) {
     sock.write("Host: " + host + "\r\n");
     sock.write("Connection: close\r\n");
     sock.write("\r\n");
-    sock.shutdown(SHUT_WR);
+    // sock.shutdown(SHUT_WR);
 
     while (!sock.eof()) {
         cout << sock.read();
     }
-    sock.close();
+    // sock.close();
     
     cerr << "Function called: get_URL(" << host << ", " << path << ").\n";
     sock.wait_until_closed();
