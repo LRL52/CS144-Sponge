@@ -72,23 +72,23 @@ void TCPSpongeSocket<AdaptT>::_initialize_TCP(const TCPConfig &config) {
     //    given to underlying datagram socket)
 
     // rule 1: read from filtered packet stream and dump into TCPConnection
-    _eventloop.add_rule(_datagram_adapter,
-                        Direction::In,
-                        [&] {
-                            auto seg = _datagram_adapter.read();
-                            if (seg) {
-                                _tcp->segment_received(move(seg.value()));
-                            }
+    _eventloop.add_rule(
+        _datagram_adapter,
+        Direction::In,
+        [&] {
+            auto seg = _datagram_adapter.read();
+            if (seg) {
+                _tcp->segment_received(move(seg.value()));
+            }
 
-                            // debugging output:
-                            if (_thread_data.eof() and _tcp.value().bytes_in_flight() == 0 and not _fully_acked) {
-                                cerr << "DEBUG: Outbound stream to "
-                                     << _datagram_adapter.config().destination.to_string()
-                                     << " has been fully acknowledged.\n";
-                                _fully_acked = true;
-                            }
-                        },
-                        [&] { return _tcp->active(); });
+            // debugging output:
+            if (_thread_data.eof() and _tcp.value().bytes_in_flight() == 0 and not _fully_acked) {
+                cerr << "DEBUG: Outbound stream to " << _datagram_adapter.config().destination.to_string()
+                     << " has been fully acknowledged.\n";
+                _fully_acked = true;
+            }
+        },
+        [&] { return _tcp->active(); });
 
     // rule 2: read from pipe into outbound buffer
     _eventloop.add_rule(
@@ -150,15 +150,16 @@ void TCPSpongeSocket<AdaptT>::_initialize_TCP(const TCPConfig &config) {
         });
 
     // rule 4: read outbound segments from TCPConnection and send as datagrams
-    _eventloop.add_rule(_datagram_adapter,
-                        Direction::Out,
-                        [&] {
-                            while (not _tcp->segments_out().empty()) {
-                                _datagram_adapter.write(_tcp->segments_out().front());
-                                _tcp->segments_out().pop();
-                            }
-                        },
-                        [&] { return not _tcp->segments_out().empty(); });
+    _eventloop.add_rule(
+        _datagram_adapter,
+        Direction::Out,
+        [&] {
+            while (not _tcp->segments_out().empty()) {
+                _datagram_adapter.write(_tcp->segments_out().front());
+                _tcp->segments_out().pop();
+            }
+        },
+        [&] { return not _tcp->segments_out().empty(); });
 }
 
 //! \brief Call [socketpair](\ref man2::socketpair) and return connected Unix-domain sockets of specified type
