@@ -153,7 +153,7 @@ void TCPConnection::_set_rst_state(const bool send_rst) {
         seg.header().seqno = _sender.next_seqno();
         seg.header().rst = true;
         // 直接把包送到 _segments_out，不需要再调用 _add_ackno_and_window_to_send 发送出去了
-        _segments_out.emplace(move(seg));
+        _segments_out.emplace(std::move(seg));
     }
     _sender.stream_in().set_error();
     _receiver.stream_out().set_error();
@@ -163,13 +163,13 @@ void TCPConnection::_set_rst_state(const bool send_rst) {
 
 void TCPConnection::_add_ackno_and_window_to_send() {
     while (!_sender.segments_out().empty()) {
-        auto seg = move(_sender.segments_out().front());
+        auto seg = std::move(_sender.segments_out().front());
         _sender.segments_out().pop();
         if (_receiver.ackno().has_value()) {
             seg.header().ack = true;
             seg.header().ackno = _receiver.ackno().value();
         }
         seg.header().win = min(static_cast<size_t>(numeric_limits<uint16_t>::max()), _receiver.window_size());
-        _segments_out.emplace(move(seg));
+        _segments_out.emplace(std::move(seg));
     }
 }

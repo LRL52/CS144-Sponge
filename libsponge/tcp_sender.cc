@@ -39,7 +39,7 @@ void TCPSender::fill_window() {
         auto payload_size = min(TCPConfig::MAX_PAYLOAD_SIZE, \
                             min(window_size - _bytes_in_flight - seg.header().syn, _stream.buffer_size()));
         auto payload = _stream.read(payload_size);
-        seg.payload() = Buffer(move(payload));
+        seg.payload() = Buffer(std::move(payload));
 
         // 如果读到 EOF 了且 window_size 还有空位
         if (!_set_fin_flag && _stream.eof() && _bytes_in_flight + seg.length_in_sequence_space() < window_size) {
@@ -59,7 +59,7 @@ void TCPSender::fill_window() {
         if (!_timer.is_running()) _timer.restart();
 
         // 保存备份，重发时可能会用
-        _outstanding_seg.emplace(_next_seqno, move(seg));
+        _outstanding_seg.emplace(_next_seqno, std::move(seg));
         
         // 更新序列号和发出但未 ACK 的字节数
         _next_seqno += length; // _next_seqno 是 absolute seqno
@@ -130,5 +130,5 @@ void TCPSender::send_empty_segment() {
     // 发送空数据报，可以用于仅仅 ACK
     TCPSegment seg;
     seg.header().seqno = next_seqno();
-    _segments_out.emplace(move(seg));
+    _segments_out.emplace(std::move(seg));
 }
