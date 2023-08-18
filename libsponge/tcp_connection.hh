@@ -27,10 +27,10 @@ class TCPConnection {
     //! Is the connection still alive in any way?
     bool _is_active = true;
 
-    // ! 置为 RST 状态，如果 send_rst 为 true，则发送 RST 包
+    //! 置为 RST 状态，如果 send_rst 为 true，则发送 RST 包
     void _set_rst_state(const bool send_rst);
 
-    // ! 将待发送的包添加上 ackno 和 window_size 发送出去
+    //! 将待发送的包添加上 ackno 和 window_size 发送出去
     void _add_ackno_and_window_to_send();
 
   public:
