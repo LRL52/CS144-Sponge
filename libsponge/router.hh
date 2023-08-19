@@ -2,9 +2,13 @@
 #define SPONGE_LIBSPONGE_ROUTER_HH
 
 #include "network_interface.hh"
+#include "address.hh"
 
+
+#include <cstdint>
 #include <optional>
 #include <queue>
+#include <vector>
 
 //! \brief A wrapper for NetworkInterface that makes the host-side
 //! interface asynchronous: instead of returning received datagrams
@@ -43,6 +47,26 @@ class AsyncNetworkInterface : public NetworkInterface {
 class Router {
     //! The router's collection of network interfaces
     std::vector<AsyncNetworkInterface> _interfaces{};
+
+    //! 路由表条目
+    struct RouteEntry {
+        uint32_t route_prefix;
+        uint8_t prefix_length;
+        std::optional<Address> next_hop;
+        size_t interface_num;
+
+        RouteEntry() = default;
+        RouteEntry(const uint32_t _route_prefix, const uint8_t _prefix_length, \
+        const std::optional<Address> &_next_hop, const size_t _interface_num) :
+            route_prefix(_route_prefix),
+            prefix_length(_prefix_length),
+            next_hop(_next_hop),
+            interface_num(_interface_num)
+            {}
+    };
+
+    //! 路由表
+    std::vector<RouteEntry> _route_table{};
 
     //! Send a single datagram from the appropriate outbound interface to the next hop,
     //! as specified by the route with the longest prefix_length that matches the

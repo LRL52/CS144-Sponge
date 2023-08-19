@@ -29,14 +29,38 @@ void Router::add_route(const uint32_t route_prefix,
     cerr << "DEBUG: adding route " << Address::from_ipv4_numeric(route_prefix).ip() << "/" << int(prefix_length)
          << " => " << (next_hop.has_value() ? next_hop->ip() : "(direct)") << " on interface " << interface_num << "\n";
 
-    DUMMY_CODE(route_prefix, prefix_length, next_hop, interface_num);
     // Your code here.
+    _route_table.emplace_back(route_prefix, prefix_length, next_hop, interface_num);
 }
 
 //! \param[in] dgram The datagram to be routed
 void Router::route_one_datagram(InternetDatagram &dgram) {
-    DUMMY_CODE(dgram);
     // Your code here.
+    // 取出 IP 字段，在路由表中进行最长前缀匹配
+    auto ip = dgram.header().dst;
+    auto best_match_it = _route_table.end();
+    for (auto it = _route_table.begin(); it != _route_table.end(); it = std::next(it)) {
+        // 前缀匹配成功
+        //! NOTE: 根据 CSAPP，在 32 位整数下，右移量只取低 5 位（即 mod 32），因此右移 32 位等价于右移 0 位，因此这里需要特判右移 32 位的情况 
+        // cerr << "DEBUG route table: " << ((it->route_prefix ^ ip) >> (32 - it->prefix_length)) << '\n';
+        if (it->prefix_length == 0 ||  (it->route_prefix ^ ip) >> (32 - it->prefix_length) == 0) {
+            if (best_match_it == _route_table.end() || it->prefix_length > best_match_it->prefix_length) {
+                best_match_it = it;
+            }
+        }
+    }
+    // 匹配到路由规则并且 TTL 大于 1
+    if (best_match_it != _route_table.end() && dgram.header().ttl > 1) {
+        --dgram.header().ttl;
+        auto &next_interface = interface(best_match_it->interface_num);
+        // 如果路由器直接连接到相关网络，则下一跳就是目的 IP 地址，否则为下一跳路由器的 IP 地址
+        if (best_match_it->next_hop.has_value()) {
+            next_interface.send_datagram(dgram, best_match_it->next_hop.value());
+        } else {
+            next_interface.send_datagram(dgram, Address::from_ipv4_numeric(ip));
+        }
+    }
+    // 其余情况数据报则直接丢弃，也不作 ICMP 回复
 }
 
 void Router::route() {
