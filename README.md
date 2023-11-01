@@ -1,4 +1,4 @@
-# <img src="images/stanford.png" style="width:1.5em; vertical-align: middle;"> Stanford CS144
+# Stanford CS144
 
 CS144 Sponge 2021 版，Lab 0-7 初始代码在对应分支下，可以通过克隆本项目再回滚的方式完成实验。
 
