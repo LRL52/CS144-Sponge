@@ -10,6 +10,11 @@
 //! and then no more bytes can be written.
 class ByteStream {
   private:
+    std::string buffer_{};
+    size_t capacity_;
+    size_t bytes_read_{0};
+    size_t bytes_written_{0};
+    bool end_flag{false};
     // Your code here -- add private members as necessary.
 
     // Hint: This doesn't need to be a sophisticated data structure at
